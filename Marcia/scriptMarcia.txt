@@ -1,0 +1,185 @@
+CREATE DATABASE teste1;
+USE teste1;
+
+CREATE TABLE User_User_Configs (
+    ID_user INTEGER PRIMARY KEY,
+    nickname VARCHAR(255),
+    email VARCHAR(255),
+    password VARCHAR(255),
+    ID_match_history INTEGER,
+    ID_configs INTEGER,
+    FOREIGN KEY (ID_match_history) REFERENCES Match_History(ID_match_history),
+    FOREIGN KEY (ID_configs) REFERENCES User_Configs(ID_configs)
+);
+
+CREATE TABLE User_Configs (
+    ID_configs INTEGER PRIMARY KEY,
+    has_visible_profile BOOLEAN,
+    allow_friend_requests BOOLEAN,
+    allow_team_invites BOOLEAN,
+    ID_user INTEGER,
+    FOREIGN KEY (ID_user) REFERENCES User_User_Configs(ID_user)
+);
+
+CREATE TABLE Games (
+    ID_game INTEGER PRIMARY KEY,
+    name VARCHAR(255),
+    ID_map INTEGER,
+    ID_game_configs INTEGER,
+    ID_category INTEGER,
+    description VARCHAR(255),
+    FOREIGN KEY (ID_game_configs) REFERENCES Games_Item(fk_Games_ID_game),
+    FOREIGN KEY (ID_category) REFERENCES Category_Game(fk_Category_ID_category)
+);
+
+CREATE TABLE Category (
+    ID_category INTEGER PRIMARY KEY,
+    name VARCHAR(255),
+    description VARCHAR(255)
+);
+
+CREATE TABLE Match_History (
+    ID_user INTEGER,
+    ID_match INTEGER,
+    ID_match_history INTEGER PRIMARY KEY,
+    FOREIGN KEY (ID_user) REFERENCES User_User_Configs(ID_user),
+    FOREIGN KEY (ID_match) REFERENCES Match(ID_match)
+);
+
+CREATE TABLE Participations (
+    ID_participations INTEGER PRIMARY KEY,
+    ID_match INTEGER,
+    ID_user INTEGER,
+    FOREIGN KEY (ID_match) REFERENCES Match(ID_match),
+    FOREIGN KEY (ID_user) REFERENCES User_User_Configs(ID_user)
+);
+
+CREATE TABLE Statistics (
+    ID_statistics INTEGER PRIMARY KEY,
+    ID_user INTEGER,
+    ID_match INTEGER,
+    kills INTEGER,
+    dies INTEGER,
+    score INTEGER,
+    FOREIGN KEY (ID_user) REFERENCES User_User_Configs(ID_user),
+    FOREIGN KEY (ID_match) REFERENCES Match(ID_match)
+);
+
+CREATE TABLE Match (
+    ID_match INTEGER PRIMARY KEY,
+    rounds INTEGER,
+    timestamp TIMESTAMP,
+    ID_game INTEGER,
+    duration TIME,
+    result BOOLEAN,
+    ID_participations INTEGER,
+    FOREIGN KEY (ID_game) REFERENCES Games(ID_game),
+    FOREIGN KEY (ID_participations) REFERENCES Participations(ID_participations)
+);
+
+CREATE TABLE Item (
+    ID_item INTEGER PRIMARY KEY,
+    name VARCHAR(255),
+    description VARCHAR(255),
+    damage INTEGER,
+    defense INTEGER,
+    duration INTEGER,
+    item_design_url VARCHAR(255)
+);
+
+CREATE TABLE Team (
+    ID_team INTEGER PRIMARY KEY,
+    ID_team_user INTEGER,
+    FOREIGN KEY (ID_team_user) REFERENCES Team_User(fk_Team_User_ID_team_user)
+);
+
+CREATE TABLE Team_User (
+    ID_team_user INTEGER PRIMARY KEY,
+    ID_user INTEGER,
+    ID_team INTEGER,
+    FOREIGN KEY (ID_user) REFERENCES User_User_Configs(ID_user),
+    FOREIGN KEY (ID_team) REFERENCES Team(ID_team)
+);
+
+CREATE TABLE Special_Event (
+    ID_special_event INTEGER PRIMARY KEY,
+    name VARCHAR(255),
+    duration_time TIME,
+    result BOOLEAN
+);
+
+CREATE TABLE Special_Event_Participations (
+    ID_special_event_participations INTEGER PRIMARY KEY,
+    ID_special_event INTEGER,
+    ID_user INTEGER,
+    FOREIGN KEY (ID_special_event) REFERENCES Special_Event(ID_special_event),
+    FOREIGN KEY (ID_user) REFERENCES User_User_Configs(ID_user)
+);
+
+CREATE TABLE Category_Game (
+    fk_Games_ID_game INTEGER,
+    fk_Category_ID_category INTEGER,
+    FOREIGN KEY (fk_Games_ID_game) REFERENCES Games(ID_game),
+    FOREIGN KEY (fk_Category_ID_category) REFERENCES Category(ID_category)
+);
+
+CREATE TABLE User_Match_History (
+    fk_User_User_Configs_ID_user INTEGER,
+    fk_User_User_Configs_ID_configs INTEGER,
+    fk_Match_History_ID_match_history INTEGER,
+    FOREIGN KEY (fk_User_User_Configs_ID_user, fk_User_User_Configs_ID_configs) REFERENCES User_User_Configs(ID_user, ID_configs),
+    FOREIGN KEY (fk_Match_History_ID_match_history) REFERENCES Match_History(ID_match_history)
+);
+
+CREATE TABLE Match_History_Match (
+    fk_Match_ID_match INTEGER,
+    fk_Match_History_ID_match_history INTEGER,
+    FOREIGN KEY (fk_Match_ID_match) REFERENCES Match(ID_match),
+    FOREIGN KEY (fk_Match_History_ID_match_history) REFERENCES Match_History(ID_match_history)
+);
+
+CREATE TABLE User_Statistics (
+    fk_User_User_Configs_ID_user INTEGER,
+    fk_User_User_Configs_ID_configs INTEGER,
+    fk_Statistics_ID_statistics INTEGER,
+    FOREIGN KEY (fk_User_User_Configs_ID_user, fk_User_User_Configs_ID_configs) REFERENCES User_User_Configs(ID_user, ID_configs),
+    FOREIGN KEY (fk_Statistics_ID_statistics) REFERENCES Statistics(ID_statistics)
+);
+
+CREATE TABLE Match_Participations (
+    fk_Participations_ID_participations INTEGER,
+    fk_Match_ID_match INTEGER,
+    FOREIGN KEY (fk_Participations_ID_participations) REFERENCES Participations(ID_participations),
+    FOREIGN KEY (fk_Match_ID_match) REFERENCES Match(ID_match)
+);
+
+CREATE TABLE Games_Item (
+    fk_Item_ID_item INTEGER,
+    fk_Games_ID_game INTEGER,
+    FOREIGN KEY (fk_Item_ID_item) REFERENCES Item(ID_item),
+    FOREIGN KEY (fk_Games_ID_game) REFERENCES Games(ID_game)
+);
+
+CREATE TABLE Games_Special_Event (
+    fk_Games_ID_game INTEGER,
+    fk_Special_Event_ID_special_event INTEGER,
+    FOREIGN KEY (fk_Games_ID_game) REFERENCES Games(ID_game),
+    FOREIGN KEY (fk_Special_Event_ID_special_event) REFERENCES Special_Event(ID_special_event)
+);
+
+CREATE TABLE Special_Event_Its_Participations (
+    fk_Special_Event_ID_special_event INTEGER,
+    fk_Special_Event_Participations_ID_special_event_participations INTEGER,
+    FOREIGN KEY (fk_Special_Event_ID_special_event) REFERENCES Special_Event(ID_special_event),
+    FOREIGN KEY (fk_Special_Event_Participations_ID_special_event_participations) REFERENCES Special_Event_Participations(ID_special_event_participations)
+);
+
+CREATE TABLE Relation_Team_User (
+    fk_Team_ID_team INTEGER,
+    fk_Team_User_ID_team_user INTEGER,
+    FOREIGN KEY (fk_Team_ID_team) REFERENCES Team(ID_team),
+    FOREIGN KEY (fk_Team_User_ID_team_user) REFERENCES Team_User(ID_team_user)
+);
+
+
+        
